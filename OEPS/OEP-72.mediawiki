@@ -1,6 +1,6 @@
 <pre>
   OEP: 70
-  Title: DDXF DToken+Oep8 Standard
+  Title: DDXF DToken+Agent Standard
   Author:
   Type: Standard
   Status: Accepted
@@ -8,7 +8,6 @@
 </pre>
 
 ==Abstract==
-
 
 
 ==Motivation==
@@ -236,6 +235,42 @@ event
 
 
 
+====useTokenByAgent====
+
+<pre>
+fn use_token_by_agent(account: &Address, agent: &Address, token_id: &[u8], n: U128) -> bool
+</pre>
+
+use token by agent, the agent of the token has the right to invoke this method
+
+
+{| class = "wikitable"
+! style = "text-align:center;"| Parameter
+! Type
+! Desc
+|-
+| account
+| &Address
+| buyer address
+|-
+| agent
+| &Address
+| agent address
+|-
+| token_id
+| &[u8]
+| the number of purchases
+|-
+| n
+| U128
+| represents the number of consuming token
+|}
+
+event
+
+["useTokenByAgent", account,agent, token_id, n]
+
+
 ====deleteToken====
 
 <pre>
@@ -263,9 +298,120 @@ event
 ["deleteToken", account, token_id]
 
 
+====addTokenAgents====
 
-For methods related to the oep8 standard, please refer to
-[Oep8](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-8.mediawiki)
+<pre>
+fn add_token_agents(
+    account: &Address,
+    token_id: &[u8],
+    agents: &[Address],
+    n: Vec<U128>,
+) -> bool
+</pre>
+
+this method only append agents for the specified token.
+
+{| class = "wikitable"
+! style = "text-align:center;"| Parameter
+! Type
+! Desc
+|-
+| account
+| &Address
+| buyer address
+|-
+| token_id
+| &[u8]
+| token id
+|-
+| agents
+| &[Address]
+| the array of agent address
+|-
+| n
+| Vec<U128>
+| number of authorizations per agent
+|}
+
+event
+
+[
+["addTokenAgents", account, token_id, agent, n]
+]
+
+====addAgents====
+
+<pre>
+fn add_agents(
+    account: &Address,
+    agents: Vec<Address>,
+    n: Vec<U128>,
+    token_ids: Vec<Vec<u8>>,
+) -> bool
+</pre>
+
+this method only append agents for the specified token.
+
+{| class = "wikitable"
+! style = "text-align:center;"| Parameter
+! Type
+! Desc
+|-
+| account
+| &Address
+| buyer address
+|-
+| agents
+| &[Address]
+| the array of agent address
+|-
+| n
+| Vec<U128>
+| number of authorizations per agent
+|-
+| token_id
+| Vec<Vec<u8>>
+| token ids
+|}
+
+event
+
+[
+["addTokenAgents", account, token_id, agent, n]
+]
+
+
+====removeTokenAgents====
+
+<pre>
+fn remove_token_agents(account: &Address, token_id: &[u8], agents: &[Address]) -> bool
+</pre>
+
+this method only append agents for the specified token.
+
+{| class = "wikitable"
+! style = "text-align:center;"| Parameter
+! Type
+! Desc
+|-
+| account
+| &Address
+| buyer address
+|-
+| token_id
+| &[u8]
+| token id
+|-
+| agents
+| &[Address]
+| the array of agent address
+|}
+
+event
+
+[
+["removeTokenAgents", account, token_id]
+]
 
 
 ===Implementation===

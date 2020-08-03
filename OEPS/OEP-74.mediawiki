@@ -1,6 +1,6 @@
 <pre>
   OEP: 70
-  Title: DDXF DToken+Oep5 Standard
+  Title: DDXF DToken+Oep4 Standard
   Author:
   Type: Standard
   Status: Accepted
@@ -9,7 +9,7 @@
 
 ==Abstract==
 
-
+DToken and Oep4 implementation
 
 ==Motivation==
 
@@ -262,8 +262,10 @@ event
 ["deleteToken", account, token_id]
 
 
+
 For methods related to the oep8 standard, please refer to
-[Oep5](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-5.mediawiki)
+[Oep4](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-4.mediawiki)
 
 
 ===Implementation===
+

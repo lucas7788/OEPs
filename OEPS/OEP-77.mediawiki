@@ -1,6 +1,6 @@
 <pre>
-  OEP: 71
-  Title: DDXF SplitPolicy Standard
+  OEP: 77
+  Title: DDXF Accountant Standard
   Author:
   Type: Standard
   Status: Accepted
@@ -9,41 +9,32 @@
 
 ==Abstract==
 
-
-The contract is used to determine the profit distribution strategy of multiple owners of goods
-
+The contract is used to agree on the profit distribution ratio between the marketplace and the seller
 
 ==Motivation==
 
-There may be multiple owners of goods on the chain, and each owner's share of profit distribution is different. The specific allocation can be set in this contract
 
 ==Specification==
 
 ===Methods===
 
-====register====
+====setFeeSplitModel====
 
 <pre>
-pub fn register(key: &[u8], param_bytes: &[u8]) -> bool
+fn set_fee_split_model(seller_acc: &Address, fsm_bytes: &[u8]) -> bool
 </pre>
 
-register the dividend distribution strategy on the chain
+set charging model, need mp and seller signature
 
-the RegisterParam is defined as follow:
+the FeeSplitModel is defined as follow:
 ```
-#[derive(Encoder, Decoder)]
-pub struct RegisterParam {
-    addr_amt: Vec<AddrAmt>,  //Address and share for agreed profit distribution
-    token_type: TokenType,   //The currency used for the agreed fee. Ont, ong and oep4 are currently supported
-    contract_addr: Option<Address>,//If it is an oep4 token, the address where the oep4 contract needs to be executed
-}
 #[derive(Encoder, Decoder, Clone)]
-pub struct AddrAmt {
-    to: Address,
-    weight: u32,
-    has_withdraw: bool,
+pub struct FeeSplitModel {
+    pub weight: u16,
 }
 ```
+
+* `weight` Marketplace fee ratio
 
 
 The parameters are of the following type:
@@ -52,11 +43,11 @@ The parameters are of the following type:
 ! style = "text-align:center;"| Parameter
 ! Type| Parameter Description
 |-
-| key
-| &[u8]
-| key is also called resource_id in the other contract, used to mark the uniqueness of dividend strategy
+| seller_acc
+| &Address
+| the owner of token template
 |-
-| param_bytes
+| fsm_bytes
 | &[u8]
 | the serialization result of FeeSplitModel
 |}
@@ -64,16 +55,16 @@ The parameters are of the following type:
 Event
 
 This method will launch the following events:
-["register", key, param_bytes]
+["setFeeSplitModel", seller_acc, fsm_bytes]
 
 
-====getRegisterParam====
+====getFeeSplitModel====
 
 <pre>
-pub fn get_register_param(key: &[u8]) -> RegisterParam
+fn get_fee_split_model(seller_acc: &Address) -> FeeSplitModel
 </pre>
 
-query RegisterParam by key
+query charging model
 
 The parameters are of the following type:
 
@@ -81,19 +72,25 @@ The parameters are of the following type:
 ! style = "text-align:center;"| Parameter
 ! Type| Parameter Description
 |-
-| key
-| &[u8]
-| key is also called resource_id in the other contract, used to mark the uniqueness of dividend strategy
+| seller_acc
+| &Address
+| seller address
 |}
 
 
-====transfer====
+====transferAmount====
 
 <pre>
-pub fn transfer(from: &Address, key: &[u8], amt: U128) -> bool
+pub fn transfer_amount(
+    order_id_bytes: &[u8],
+    buyer_acc: &Address,
+    split_contract_address: &Address,
+    fee: &[u8],
+    n: U128,
+) -> bool
 </pre>
 
-Transfer token assets to current contract address
+transfer fee to the contract and register the income distribution balance of this order
 
 The parameters are of the following type:
 
@@ -102,103 +99,87 @@ The parameters are of the following type:
 ! Type
 ! Desc
 |-
-| from
-| &Address
+| order_id_bytes
+| &[u8]
+| the serialization result of OrderId
+|-
+| buyer_acc
+| &[u8]
 | buyer address
 |-
-| key
-| &[u8]
-| Commodity ID
-|-
-| amt
-| U128
-| Fees paid by the buyer
-|}
-
-event
-
-["transfer", from, key, amt]
-
-=========getBalance=======
-
-<pre>
-pub fn get_balance(key: &[u8]) -> U128
-</pre>
-
-Query balance by commodity ID
-
-{| class = "wikitable"
-! style = "text-align:center;"| Parameter
-! Type
-! Desc
-|-
-| key
-| &[u8]
-| commodity ID
-|}
-
-
-====withdraw====
-
-<pre>
-pub fn withdraw(key: &[u8], addr: &Address) -> bool
-</pre>
-
-the data owner withdraw token from the contract.
-
-{| class = "wikitable"
-! style = "text-align:center;"| Parameter
-! Type
-! Desc
-|-
-| key
-| &[u8]
-| commodity ID
-|-
-| addr
+| split_contract_address
 | &Address
-| the address who withdraw token, need the address signature
+| split contract address which register the distribution strategy
+|-
+| fee
+| &[u8]
+| the cost of one share
+|-
+| n
+| U128
+| the number of shares purchased
 |}
-
 
 event
 
-["withdraw", key, addr]
+["transferAmount", order_id_bytes, buyer_acc, split_contract_address,fee_bytes,n]
 
-
-
-====transferWithdraw====
+=========getSettleInfo=======
 
 <pre>
-pub fn transfer_withdraw(from: &Address, key: &[u8], amt: U128) -> bool
+pub fn get_settle_info(order_id: &[u8]) -> SettleInfo
 </pre>
 
-Delete the specified authorized address according to TokenTemplateId
-
+query settle info by order id
 
 {| class = "wikitable"
 ! style = "text-align:center;"| Parameter
 ! Type
 ! Desc
 |-
-| from
-| &Address
-| buyer address
-|-
-| key
+| order_id
 | &[u8]
-| commodity ID
-|-
-| amt
-| U128
-| Fees paid by the buyer
+| the serialization result of OrderId
 |}
+
+return type is `SettleInfo` is defined as follows:
+```
+#[derive(Encoder, Decoder)]
+pub struct SettleInfo {
+    pub split_contract_addr: Address,
+    pub fee: Fee,
+    pub n: U128,
+}
+```
+
+====settle====
+
+<pre>
+pub fn settle(seller_acc: &Address, order_id: &[u8]) -> bool
+</pre>
+
+expense settlement, first transfer fee to mp, second invoke "transferWithdraw" method of split contract
+
+{| class = "wikitable"
+! style = "text-align:center;"| Parameter
+! Type
+! Desc
+|-
+| seller_acc
+| &Address
+| the seller address, need the address signature
+|-
+| order_id
+| &[u8]
+| the serialization result of OrderId
+|}
+
 
 event
 
-["transferWithdraw", from, key, amt]
+["settle", seller_acc, order_id]
 
 
 ===Implementation===
 
-[oep-69](https://github.com/ont-bizsuite/ddxf-contract-suite/tree/master/contracts/split_policy)
+[oep-69](https://github.com/ont-bizsuite/ddxf-contract-suite/tree/master/contracts/accountant)
