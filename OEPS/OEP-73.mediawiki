@@ -1,6 +1,6 @@
 <pre>
   OEP: 70
-  Title: DDXF DToken Standard
+  Title: DDXF DToken+Oep4 Standard
   Author:
   Type: Standard
   Status: Accepted
@@ -9,7 +9,7 @@
 
 ==Abstract==
 
-
+DToken and Oep4 implementation
 
 ==Motivation==
 
@@ -145,6 +145,7 @@ event
 ["authorizeTokenTemplate", token_template_id, authorized_addr]
 
 
+
 ====removeAuthorizeAddr====
 
 <pre>
@@ -261,6 +262,10 @@ event
 ["deleteToken", account, token_id]
 
 
+
+For methods related to the oep8 standard, please refer to
+[Oep4](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-4.mediawiki)
+
+
 ===Implementation===
 
-[oep-69](https://github.com/ont-bizsuite/ddxf-contract-suite/tree/master/contracts/marketplace)

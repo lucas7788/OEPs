@@ -9,7 +9,7 @@
 
 ==Abstract==
 
-
+The contract is used to publish、update and delete the goods on the chain, and users can purchase them.
 
 ==Motivation==
 
