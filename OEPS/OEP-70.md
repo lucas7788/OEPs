@@ -58,7 +58,7 @@ pub struct ResourceDDO {
 }
 ```
 
-This ResourceDDO contains three optional fields,[contract address](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-73.mediawiki%7Cdtoken),[contract address](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-77.mediawiki%7Caccountant) and[contract address](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-78.mediawiki%7Csplit_policy).
+This ResourceDDO contains three optional fields,[dtoken contract address](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-73.md),[accountant contract address](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-77.md) and [split_policy contract address](https://github.com/ontio/OEPs/blob/master/OEPS/OEP-78.md).
 
 If dtoken_contract_address is not set, the default dtoken contract address will be used.If accountant_contract_address is not set, the MP will not be charged for the purchase.If split_policy_contract_address is not set, the default split policy contract address will be used.
 
